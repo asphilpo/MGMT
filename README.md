@@ -49,3 +49,9 @@ That's it that's literally the whole thing!
 
 Took me an embarrassing amount of time to make but hopefully saves you some time in the future! 
 Many thank yous to the folks that helped me smooth out the rough edges into slightly less rough edges. 
+
+
+
+HOW TO RUN IT:
+
+Just Click on _MGMT.py and it should do the rest!
