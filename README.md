@@ -4,14 +4,14 @@ A small pile of scripts for a content data entry workflow centered around Dropbo
 
 THINGS YOU NEED TO MAKE THIS TRASH FIRE FUNCTIONAL:
 
-0) Python. I Built it in 3.12 so I'd start there.
+0. Python. I Built it in 3.12 so I'd start there.
 
-0.5) FFMPEG. Don't leave home without it clearly defined in your PATH environment variables!
+0.5. FFMPEG. Don't leave home without it clearly defined in your PATH environment variables!
 
-1) An Airtable API Key. You get this from the airtable developer hub.
+1. An Airtable API Key. You get this from the airtable developer hub.
 	-Needs Read/Write Permissions of records on whatever table your content is going to be catalogued in. 
 	
-2) A Dropbox API App Secret and Client Id
+2. A Dropbox API App Secret and Client Id
 	- You get these by making an "App" for Dropbox through their deveoper hub. You need to give the app 
 		basically full permissions to your acct but you will mostly be using
 			Read/Create Share Link Functionality.
