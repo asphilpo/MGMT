@@ -3,6 +3,7 @@ A small pile of scripts for a content data entry workflow centered around Dropbo
 
 
 THINGS YOU NEED TO MAKE THIS TRASH FIRE FUNCTIONAL:
+
 0) Python. I Built it in 3.12 so I'd start there.
 
 0.5) FFMPEG. Don't leave home without it clearly defined in your PATH environment variables!
