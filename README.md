@@ -12,7 +12,7 @@ THINGS YOU NEED TO MAKE THIS TRASH FIRE FUNCTIONAL:
 	-Needs Read/Write Permissions of records on whatever table your content is going to be catalogued in. 
 	
 2. A Dropbox API App Secret and Client Id
-	- You get these by making an "App" for Dropbox through their deveoper hub. You need to give the app 
+	- You get these by making an "App" for Dropbox through their developer hub. You need to give the app 
 		basically full permissions to your acct but you will mostly be using
 			Read/Create Share Link Functionality.
 			
