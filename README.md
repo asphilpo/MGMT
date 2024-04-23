@@ -48,7 +48,7 @@ Otherwise you will get a "Not Found" type error from the dropbox API. (Thanks Jo
 - Duration
 - Thumbnail
 
-- If any of these are spelled differently or mismatched in your table you will get a 422 from airtable.
+***If any of these are spelled differently or mismatched in your table you will get a 422 from airtable.***
 
 I would start them all [EXCEPT THUMBNAILS] as single-line text fields, but once you've done a volley, I like to change version, resolution, and folder to single-selects, and then add additional entries for the select as I go, to leverage the 
 	Built in color-coding of Airtable.
