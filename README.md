@@ -21,8 +21,13 @@ What is does:
 
 1) Catalogues all of your API Keys and directories into "secrets.json" This becomes the codex through which the rest of the script finds and records media info.
 
+1a) A NOTE ON DROPBOX/THUMBNAIL/PATH: This wants to be the relative path of your thumbnail folder as though accessing it from the web, rather than your browser. 
+So this variable will read something like "/Project/Thumbnail/Folder" for the local path of "C:\\Users\Me\Dropbox\Project\Thumbnail\Folder".
+It is important to leave off the Trailing "/" - it should read exactly as above with the last character of the string being the last character of your folder name.
+Otherwise you will get a "Not Found" type error from the dropbox API. (Thanks Josh!)
 
-2) Makes a fun little thumbnail at 50% duration of your clip and drops it in a folder you specify (this wants to be on your Dropbox).
+
+3) Makes a fun little thumbnail at 50% duration of your clip and drops it in a folder you specify (this wants to be on your Dropbox).
 
 
 2a) If you have any still image files, I suggest just copying them into the thumbnail folder directly. Maybe in a later version I will include a function that does this automagically. 
@@ -41,7 +46,9 @@ What is does:
 - Resolution
 - Date Created
 - Duration
-- Thumbnails
+- Thumbnail
+
+- If any of these are spelled differently or mismatched in your table you will get a 422 from airtable.
 
 I would start them all [EXCEPT THUMBNAILS] as single-line text fields, but once you've done a volley, I like to change version, resolution, and folder to single-selects, and then add additional entries for the select as I go, to leverage the 
 	Built in color-coding of Airtable.
