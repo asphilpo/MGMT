@@ -44,16 +44,19 @@ What is does:
 - Thumbnails
 
 I would start them all [EXCEPT THUMBNAILS] as single-line text fields, but once you've done a volley, I like to change version, resolution, and folder to single-selects, and then add additional entries for the select as I go, to leverage the 
-	-Built in color-coding of Airtable.
+	Built in color-coding of Airtable.
 
 Thumbnails wants to be an attachment field. This is how we trick airtable into uploading all the images for us.
 
+***Bear in mind, the above are the only fields the script NEEDS in order to work, but the power of airtable is any additional fields, cross-lookups, and show-specific tags you might want to use alongside in additional fields. These will be ignored during any patches that occur on an update function.***
 
-
-4) Takes all the fun little Thumbnails from 2), makes a dropbox link for them, and posts that as a json packet to the corresponding file in your Airtable under "Thumbnails". Unless there isn't a record with a name that matches your thumbnail. In which case it just moves on.
+4) Takes all the fun little Thumbnails from 2., makes a dropbox link for them, and posts that as a json packet to the corresponding file in your Airtable under "Thumbnails". Unless there isn't a record with a name that matches your thumbnail. In which case it just moves on.
 
 
 That's it that's literally the whole thing!
+
+Run it as many times as you want when you get new versions delivered. Keep an eye on the command output for 422 errors from Airtable-- this means something is formatted in a way that your table cannot accept, and is a clue to check a file's resolution, version, name formatting etc.
+The script will also print the failed data packet for you to check in the same line. 
 
 Took me an embarrassing amount of time to make but hopefully saves you some time in the future! 
 Many thank yous to the folks that helped me smooth out the rough edges into slightly less rough edges. 
