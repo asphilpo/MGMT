@@ -32,7 +32,7 @@ def MakeNewSettings():
     print('No Local Settings Found. Let us make them...')
     defaults['CONTENT_SOURCE'] = input("Content Directory: ").strip()
     defaults['THUMB_DEPOT'] = input("Thumbnail Output Directory ").strip()
-    defaults['THUMB_DB_PATH'] = input("Dropbox/Format/Thumbnail/Path ").strip()
+    defaults['THUMB_DB_PATH'] = input("DROPBOX API PATH i.e. Dropbox/Format/Thumbnail/Path : ").strip()
     defaults['AIRTABLE_API_KEY'] = input("Airtable API Key: ").strip()
     defaults['AIRTABLE_BASE_KEY'] = input("Airtable Base Key [BASE_STARTS_WITH_app_IN_URL]: ").strip()
     defaults['AIRTABLE_TABLE_NAME'] = input("Airtable Table Name [TABLE_STARTS_WITH_tbl_IN_URL]: ").strip()

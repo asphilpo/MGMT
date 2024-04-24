@@ -22,12 +22,14 @@ What is does:
 1) Catalogues all of your API Keys and directories into "secrets.json" This becomes the codex through which the rest of the script finds and records media info.
 
 1a) A NOTE ON DROPBOX/THUMBNAIL/PATH: This wants to be the relative path of your thumbnail folder as though accessing it from the web, rather than your browser. 
+
+
 So this variable will read something like "/Project/Thumbnail/Folder" for the local path of "C:\\Users\Me\Dropbox\Project\Thumbnail\Folder".
 It is important to leave off the Trailing "/" - it should read exactly as above with the last character of the string being the last character of your folder name.
 Otherwise you will get a "Not Found" type error from the dropbox API. (Thanks Josh!)
 
 
-3) Makes a fun little thumbnail at 50% duration of your clip and drops it in a folder you specify (this wants to be on your Dropbox).
+2) Makes a fun little thumbnail at 50% duration of your clip and drops it in a folder you specify (this wants to be on your Dropbox).
 
 
 2a) If you have any still image files, I suggest just copying them into the thumbnail folder directly. Maybe in a later version I will include a function that does this automagically. 
@@ -73,3 +75,4 @@ Many thank yous to the folks that helped me smooth out the rough edges into slig
 HOW TO RUN IT:
 
 Just Click on _MGMT.py and it should do the rest!
+***IF YOU ARE ON A MAC, RUN _MGMT_OSX.py*** It uses a slightly different syntax.
