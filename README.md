@@ -17,7 +17,7 @@ THINGS YOU NEED TO MAKE THIS TRASH FIRE FUNCTIONAL:
 			Read/Create Share Link Functionality.
 			
 			
-What is does:
+What it does:
 
 1) Catalogues all of your API Keys and directories into "secrets.json" This becomes the codex through which the rest of the script finds and records media info.
 
