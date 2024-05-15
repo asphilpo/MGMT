@@ -50,6 +50,8 @@ def get_file_names_and_versions(folder_path):
     resolutions = []
     dates = []
     durations = []
+    fps_values = []
+    frames = []                   
 
     for root, dirs, files in os.walk(folder_path):
         sub_folder = os.path.basename(root)  # Get the name of the immediate parent folder
@@ -77,12 +79,14 @@ def get_file_names_and_versions(folder_path):
             resolution = '0x0'
             date_created = '0000-00-00 00:00:00'
             duration = '0'
+            fps = '0'
+            frame = '0'                     
 
             try:
                 # Run ffprobe command
                 cmd = [
                     'ffprobe', '-v', 'error', '-select_streams', 'v:0',
-                    '-show_entries', 'stream=width,height,duration', '-of', 'csv=p=0',
+                    '-show_entries', 'stream=width,height,duration,r_frame_rate,nb_frames', '-of', 'csv=p=0',
                     file_path
                 ]
                 result = subprocess.run(cmd, check=True, capture_output=True, text=True)
@@ -92,14 +96,18 @@ def get_file_names_and_versions(folder_path):
                 if output:
                     data = output.split(',')
                     
-                    # Ensure that data contains at least three elements before accessing its elements
-                    if len(data) >= 3:
+                    # Ensure that data contains at least four elements before accessing its elements
+                    if len(data) >= 5:
                         resolution = data[0] + 'x' + data[1]
 
-                        if data[2] != 'N/A':
-                            duration_seconds = float(data[2])
+                        if data[3] != 'N/A':
+                            duration_seconds = float(data[3])
                             duration = seconds_to_minutes_seconds(duration_seconds)
-
+                        
+                        fps = data[2]
+                        frame=data[4]
+                        
+                        
                     # Get the file creation timestamp
                     timestamp = os.path.getctime(file_path)
                     date_created = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
@@ -112,15 +120,17 @@ def get_file_names_and_versions(folder_path):
             resolutions.append(resolution)
             dates.append(date_created)
             durations.append(duration)
+            fps_values.append(fps)
+            frames.append(frame)                                  
 
-    return file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations
+    return file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames
 
 
-file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations = get_file_names_and_versions(folder_path)
+file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames = get_file_names_and_versions(folder_path)
 
 
 # Combine file names and version numbers into a list of tuples
-data = list(zip(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations))
+file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames = get_file_names_and_versions(folder_path)
 
 # Define CSV file path
 #csv_file_path = 'data.csv'
@@ -146,8 +156,8 @@ def asset_exists(asset_name):
     return False, None
 
 # Define the function to add file names to Airtable if they don't already exist
-def add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations):
-    for file_name, version_number, root_folder, sub_folder, resolution, date_created, duration in zip(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations):
+def add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames):
+    for file_name, version_number, root_folder, sub_folder, resolution, date_created, duration, fps_value, frame in zip(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames):
         asset_exists_status, record_id = asset_exists(file_name)
 
         if asset_exists_status:
@@ -159,6 +169,8 @@ def add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_fo
                     "Date Created" : date_created,
                     "Resolution" : resolution,
                     "Duration" : duration,
+                    "FPS" : fps_value,
+                    "Frame Count" : frame,                                     
 
                 }
             }
@@ -194,7 +206,7 @@ def add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_fo
  
 # Add file names and update versions to Airtable
 print(file_names) #sanity check on all the records found
-add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations) #do the thing.
+add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames) #do the thing.
 
 
 
