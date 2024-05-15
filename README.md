@@ -49,6 +49,8 @@ Otherwise you will get a "Not Found" type error from the dropbox API. (Thanks Jo
 - Date Created
 - Duration
 - Thumbnail
+- FPS
+- Frame Count
 
 ***If any of these are spelled differently or mismatched in your table you will get a 422 from airtable.***
 
