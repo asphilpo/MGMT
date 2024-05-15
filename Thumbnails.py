@@ -5,6 +5,7 @@ import os
 import subprocess
 import json
 import re
+import shutil
 from Secrets import *
 
 with open('secrets.json', 'r') as json_file:
@@ -28,12 +29,18 @@ def create_thumbnails(input_directory, output_directory, thumbnail_time_percent)
 
     for root, dirs, files in os.walk(input_directory):
         for file in files:
-            if file.lower().endswith(('.mov', '.mp4', '.png')):
-                file_path = os.path.join(root, file)
+                                                               
+            file_path = os.path.join(root, file)
+            if file.lower().endswith(('.mov', '.mp4')):
                 create_thumbnail(file_path, output_directory, thumbnail_time_percent)
+                total_files_processed += 1
+            elif file.lower().endswith(('.jpeg', '.jpg', '.png')):
+                shutil.copy(file_path, output_directory)
                 total_files_processed += 1
 
     print(f"Processing finished on {total_files_processed} files.")
+
+ 
 
 def create_thumbnail(file_path, output_directory, thumbnail_time_percent):
     try:
@@ -42,7 +49,11 @@ def create_thumbnail(file_path, output_directory, thumbnail_time_percent):
         thumbnail_path = os.path.join(output_directory, thumbnail_file_name)
 
         video_duration = get_video_duration(file_path)
-        thumbnail_time = video_duration * (thumbnail_time_percent / 100.0) / 2
+
+        if video_duration <= 1:  # Check if the video duration is less than or equal to 1 second
+            thumbnail_time = 0  # Set thumbnail time to 0 if the duration is too short
+        else:
+            thumbnail_time = video_duration * (thumbnail_time_percent / 100.0) / 2
 
         cmd = [
             'ffmpeg', '-n', '-ss', str(thumbnail_time), '-i', file_path, '-vframes', '1', '-q:v', '2',
