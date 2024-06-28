@@ -10,7 +10,7 @@ package = 'requirements.txt'
 install (package)
 
 #Input API Keys, Tokens, Directories into secrets.json
-subprocess.run(['python', 'Secrets.py'])
+#subprocess.run(['python', 'Secrets.py'])
 
 # Execute the first script
 subprocess.run(['python', 'Thumbnails.py'])

@@ -3,6 +3,7 @@ import csv
 import requests
 import dropbox
 import re
+import webbrowser
 
 from dropbox import DropboxOAuth2FlowNoRedirect
 
@@ -36,8 +37,40 @@ def DropboxTokenDespenser(APP_KEY,APP_SECRET):
     print("Access Token:", access_token)
     print("Refresh Token:", refresh_token)
 
+def DropboxTokenDespenserGUI(APP_KEY,APP_SECRET):
 
-    
+    # Initialize the Dropbox OAuth 2.0 flow
+    auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, APP_SECRET)
+
+    # Generate the authorization URL
+    authorize_url = auth_flow.start()
+
+    #Open webpage in new window
+    dbURL = authorize_url + '&response_type=code&token_access_type=offline'
+    webbrowser.open(dbURL, new=1, autoraise=True)
+
+def DropboxTokenAuthorizationGUI(APP_KEY,APP_SECRET,REFRESH_KEY):
+    # Initialize the Dropbox OAuth 2.0 flow
+    auth_flow = DropboxOAuth2FlowNoRedirect(APP_KEY, APP_SECRET)
+
+    # Generate the authorization URL
+    authorize_url = auth_flow.start()
+
+    # Once the user authorizes your app and gets the authorization code, you can exchange it for an access token
+    authorization_code = REFRESH_KEY
+
+    # Call the finish method to complete the authorization process
+    auth_result = auth_flow.finish(authorization_code)
+
+    # Extract the access token and refresh token from the auth_result
+    print(auth_result)
+    access_token = auth_result.access_token
+    refresh_token = auth_result.refresh_token
+
+    return access_token, refresh_token
+
+
+
 ##################### OAUTH EXAMPLE BELOW ##########################################
 
 #from dropbox import DropboxOAuth2FlowNoRedirect

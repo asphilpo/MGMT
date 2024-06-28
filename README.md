@@ -1,8 +1,17 @@
 # MGMT
 A small pile of scripts for a content data entry workflow centered around Dropbox and Airtable APIs
 
+# UPDATE: GUI EDITION
+With many many many thanks to Josh Spodick for his contribution I'm excited to offer up a GUI option for the MGMT package!
+Quality of life features include: 
+- File Path Browser
+- Save and Load Management Configuration
+- "Run Script" Button
+- Additional Data Fields for FPS and Frame Count -- BE SURE TO ADD THESE TO YOUR AIRTABLE OR PREPARE FOR 422 ERRORS
+ (Thanks to Jackson at F9 for these update suggestions!)
 
-THINGS YOU NEED TO MAKE THIS TRASH FIRE FUNCTIONAL:
+
+## THINGS YOU NEED TO MAKE THIS TRASH FIRE FUNCTIONAL:
 
 0. Python. I Built it in 3.12 so I'd start there.
 
@@ -17,7 +26,7 @@ THINGS YOU NEED TO MAKE THIS TRASH FIRE FUNCTIONAL:
 			Read/Create Share Link Functionality.
 			
 			
-What it does:
+## What it does:
 
 1) Catalogues all of your API Keys and directories into "secrets.json" This becomes the codex through which the rest of the script finds and records media info.
 
@@ -48,11 +57,11 @@ Otherwise you will get a "Not Found" type error from the dropbox API. (Thanks Jo
 - Resolution
 - Date Created
 - Duration
-- Thumbnail
 - FPS
 - Frame Count
+- Thumbnail
 
-***If any of these are spelled differently or mismatched in your table you will get a 422 from airtable.***
+***If any of these are spelled differently or mismatched in your table you will get a 422 Error from airtable.***
 
 I would start them all [EXCEPT THUMBNAILS] as single-line text fields, but once you've done a volley, I like to change version, resolution, and folder to single-selects, and then add additional entries for the select as I go, to leverage the 
 	Built in color-coding of Airtable.
@@ -74,7 +83,44 @@ Many thank yous to the folks that helped me smooth out the rough edges into slig
 
 
 
-HOW TO RUN IT:
 
-Just Click on _MGMT.py and it should do the rest!
-***IF YOU ARE ON A MAC, RUN _MGMT_OSX.py*** It uses a slightly different syntax.
+# HOW TO RUN IT:
+
+1. Create your airtable with the appropriate fields listed above
+
+2. retrieve all API keys and secrets needed from both airtable and dropbox
+
+3. Just Click on _GUI.py and fill out the required fields. All Fields must be filled out to work. 
+<img width="706" alt="Screenshot 2024-06-14 at 10 45 08 AM" src="https://github.com/KirbyLV/airtable_asset_MGMT/assets/127134899/8a76a8ee-7741-48b8-a944-eb9c3dec48e2">
+
+> [!IMPORTANT]
+> 3a. You can use the "Browse" buttons to select:
+> 	>The "Content Directory" - This is where you have all of your media assets you plan on using.
+>  >
+> 	>The "Thumbnail Output Directory" - This is the dropbox location where the app will place thumbnails to be used in the airtable display.
+>
+> 3b. The "Dropbox Relative Thumbnail Path" is the thumbnail output directory AFTER your dropbox folder location. For example, if your thumbnail output location is "/Users/myname/dropbox(personal)/apps/thumbnails" then your Dropbox Relative Thumbnail Path will be "/apps/thumbnails"
+>
+> 3c. The "Airtable Token" is the Airtable API token generated from the airtable developer hub
+>
+> 3d. The "Airtable Base Key" can be found in the URL of the airtable you are using as your content tracker. Look in the URL address bar of the airtbale web page when you have the table open and find the section starting with "app". For example, within `https://airtable.com/appxxxxxxx/tblyyyyyyy/viwzzzzzzz?blocks=hide` the "Base Key" is "appxxxxxxx"
+>
+> 3e. The "Airtable Table Key" can be found in the URL of the airtable you are using as your content tracker. Look in the URL address bar of the airtbale web page when you have the table open and find the section starting with "tbl". For example, within `https://airtable.com/appxxxxxxx/tblyyyyyyy/viwzzzzzzz?blocks=hide` the "Base Key" is "tblyyyyyyy"
+>
+> 3f. The "Dropbox App Key" and "Dropbox App Secret" are the api key and secret generated within the dropbox developer hub when you created an app.
+
+  4. After populating all fields above, click on "Save Configuration" and then "Retrieve Dropbox Refresh Token" 
+  	4a. The "Retrieve Dropbox Refresh Token" will open a webpage prompting you to login to the appropriate dropbox, grant permissions, and will generate a key. Copy the resulting key and paste it into the popup box below, then hit "OK"
+
+<img width="273" alt="Screenshot 2024-06-14 at 10 54 53 AM" src="https://github.com/KirbyLV/airtable_asset_MGMT/assets/127134899/23deacdb-ebda-4683-996c-e4941ef8a562">
+
+5. After populating all fields, and retrieving a refresh token, you will be able to run the app. The app will comb through your content directory, generate thumbnails, compare versions, and popualte the appropriate data in the airtable you designated. 
+
+> [!TIP]
+> If you are relaunching the app after using it before, and want to keep the same airtable and dropbox and location settings, you can click on "Load Existing Data" and all of the data previously used will load. You may have to generate a new refresh token. 
+
+Enjoy!
+
+THIS IS A WORK IN PROGRESS!
+
+All back end by Andy Philpo. Front end by Josh Spodick.

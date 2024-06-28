@@ -29,7 +29,6 @@ def create_thumbnails(input_directory, output_directory, thumbnail_time_percent)
 
     for root, dirs, files in os.walk(input_directory):
         for file in files:
-                                                               
             file_path = os.path.join(root, file)
             if file.lower().endswith(('.mov', '.mp4')):
                 create_thumbnail(file_path, output_directory, thumbnail_time_percent)
@@ -38,9 +37,8 @@ def create_thumbnails(input_directory, output_directory, thumbnail_time_percent)
                 shutil.copy(file_path, output_directory)
                 total_files_processed += 1
 
-    print(f"Processing finished on {total_files_processed} files.")
 
- 
+    print(f"Processing finished on {total_files_processed} files.")
 
 def create_thumbnail(file_path, output_directory, thumbnail_time_percent):
     try:
