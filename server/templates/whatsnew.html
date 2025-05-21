@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>What's New</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    th {
+      background-color: #007acc;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    label, select, button {
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>What's New</h1>
+  <li><a href="{{ url_for('home') }}">Return to File Issues</a></li>
+
+  <label for="timestamp-select">Select earliest report timestamp:</label>
+  <select id="timestamp-select"></select>
+  <button onclick="loadReportsFromTimestamp()">Load Reports</button>
+
+  <p id="status">Loading...</p>
+  <table id="csv-table" style="display: none;"></table>
+
+  <script>
+    function parseTimestampFromFilename(filename) {
+		const match = filename.match(/(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})/);
+		if (!match) return null;
+		const raw = match[1]; // e.g., "2025-05-15_08-25-57"
+		const formatted = raw.replace('_', 'T').replace(/-/g, ':').replace('T', 'T').replace(/:(?=\d{2}$)/, '-');
+		const [date, time] = raw.split('_');
+		const iso = `${date}T${time.replace(/-/g, ':')}`;
+		return new Date(iso);
+	}
+
+    async function populateTimestampDropdown(links) {
+      const timestamps = links
+        .map(filename => parseTimestampFromFilename(filename))
+        .filter(date => date)
+        .sort((a, b) => b - a); // Descending
+
+      const seen = new Set();
+      const dropdown = document.getElementById("timestamp-select");
+      dropdown.innerHTML = "";
+
+      timestamps.forEach(date => {
+        const iso = date.toISOString();
+        if (!seen.has(iso)) {
+          seen.add(iso);
+          const option = document.createElement("option");
+          option.value = date.toISOString();
+          option.textContent = date.toLocaleString();
+          dropdown.appendChild(option);
+        }
+      });
+    }
+
+    async function loadReportsFromTimestamp() {
+      const status = document.getElementById("status");
+      status.textContent = "Loading reports...";
+      const selectedTimestamp = document.getElementById("timestamp-select").value;
+      const selectedDate = new Date(selectedTimestamp);
+
+      const response = await fetch('/reports/');
+      const text = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      const links = Array.from(doc.querySelectorAll('a'))
+        .map(a => a.getAttribute('href'))
+        .filter(href => href && href.startsWith('whats_new_'));
+
+      const filteredLinks = links.filter(filename => {
+        const fileDate = parseTimestampFromFilename(filename);
+        return fileDate && fileDate >= selectedDate;
+      }).sort();
+
+      if (filteredLinks.length === 0) {
+        status.textContent = "No reports found after selected timestamp.";
+        document.getElementById("csv-table").style.display = "none";
+        return;
+      }
+
+      // Load and merge all CSVs
+      let allRows = [];
+      for (let i = 0; i < filteredLinks.length; i++) {
+        const csvURL = `/reports/${filteredLinks[i]}`;
+        const csvText = await fetch(csvURL).then(r => r.text());
+        const rows = csvText.trim().split('\n').map(row => row.split(','));
+        if (i === 0) {
+          allRows.push(...rows); // include header
+        } else {
+          allRows.push(...rows.slice(1)); // skip header
+        }
+      }
+
+      const table = document.getElementById("csv-table");
+      table.innerHTML = "";
+
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      allRows[0].forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      for (let i = 1; i < allRows.length; i++) {
+        const row = document.createElement("tr");
+        allRows[i].forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell;
+          row.appendChild(td);
+        });
+        tbody.appendChild(row);
+      }
+      table.appendChild(tbody);
+
+      status.style.display = "none";
+      table.style.display = "table";
+    }
+
+    async function init() {
+      const response = await fetch('/reports/');
+      const text = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, 'text/html');
+      const links = Array.from(doc.querySelectorAll('a'))
+        .map(a => a.getAttribute('href'))
+        .filter(href => href && href.startsWith('whats_new_'));
+
+      await populateTimestampDropdown(links);
+      document.getElementById("status").textContent = "Select a timestamp to load reports.";
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
