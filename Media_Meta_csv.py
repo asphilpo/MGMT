@@ -17,6 +17,8 @@ with open('secrets.json', 'r') as json_file:
 
 # POINT YOUR DIRECTORY AT THE JSON
 CONTENT_SOURCE = data['CONTENT_SOURCE']
+# Define CSV file path
+csv_file_path = data['REPORTS_DIR']+r'\data.csv'
 
 # Airtable credentials and base info
 
@@ -136,28 +138,26 @@ file_names, version_numbers, root_folders, sub_folders, resolutions, dates, dura
 # Combine file names and version numbers into a list of tuples
 data = list(zip(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames))
 
-# Define CSV file path
-#csv_file_path = 'data.csv'
+
 
 # Write data to CSV file - this is a useful sanity check to be sure your data is being organized correctly but is commented out for now.
-#with open(csv_file_path, 'w', newline='') as csvfile:
-#    writer = csv.writer(csvfile)
-#    writer.writerow(['File Name', 'Version Number', 'Folder', 'Subfolder', 'Resolution', 'Date Created', 'Duration'])  # Write header
-#    for file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations in data:
-#        writer.writerow([file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations])
-
-#print(f"CSV file '{csv_file_path}' generated successfully.")
+with open(csv_file_path, 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['File Name', 'Version Number', 'Folder', 'Subfolder', 'Resolution', 'Date Created', 'Duration', 'FPS', 'Frame Count'])  # Write header
+    for file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames in data:
+       writer.writerow([file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames])
+print(f"CSV file '{csv_file_path}' generated successfully.")
 #print (version_numbers) #unnecessary now vith the various sanity checks in the add function?
 # Define the function to check if asset already exists in Airtable using versionless names
-def asset_exists(asset_name):
-    params = {
-        'filterByFormula': f'{{Assets}} = "{asset_name}"'
-    }
-    response = requests.get(AIRTABLE_URL, params=params, headers=headers)
-    data = response.json()
-    if 'records' in data and len(data['records']) > 0:
-        return True, data['records'][0]['id']  # Return True and record ID if the asset exists
-    return False, None
+#def asset_exists(asset_name):
+#    params = {
+#        'filterByFormula': f'{{Assets}} = "{asset_name}"'
+#    }
+#    response = requests.get(AIRTABLE_URL, params=params, headers=headers)
+#    data = response.json()
+#    if 'records' in data and len(data['records']) > 0:
+#        return True, data['records'][0]['id']  # Return True and record ID if the asset exists
+#    return False, None
     
 def log_airtable_update_results(successful_files, failed_files_with_data, updated_files, log_dir="logs"):
     os.makedirs(log_dir, exist_ok=True)
@@ -181,64 +181,64 @@ def log_airtable_update_results(successful_files, failed_files_with_data, update
 
     print(f"\n📄 CSV log saved to: {log_file_path}")
 # Define the function to add file names to Airtable if they don't already exist
-def add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames):
-
-    for file_name, version_number, root_folder, sub_folder, resolution, date_created, duration, fps_value, frame in zip(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames):
-        asset_exists_status, record_id = asset_exists(file_name)
-        
-
-        if asset_exists_status:
-            # Asset already exists, update the version number and metadata
-            data = {
-                "fields": {
-                
-                    "Delivered Version": version_number,  # Include version number in the data
-                    "Date Created" : date_created,
-                    "Resolution" : resolution,
-                    "Duration" : duration,
-                    "FPS" : fps_value,
-                    "Frame Count" : frame,
-
-                }
-            }
-            response = requests.patch(f"{AIRTABLE_URL}/{record_id}", json=data, headers=headers)
-            if response.status_code != 200:
-                print(f"Failed to update version number for {os.path.splitext(file_name)[0]}. Status code: {response.status_code}")
-                print(data) #sanity check on Airtable 402 errors to see why a record bounced
-            else:
-                print(f"Version number for {file_name} updated successfully.")
-                updated_files.append(file_name)
-        else:
-            # Asset does not exist, create a new entry. Note we are using the sub_folder array for the folder entry. 
-            # parent_folder could also be called here if you wanted two layers of directory organization in your table.
-            # But we didn't so it doesn't. 
-            data = {
-                "fields": {
-                
-                    "Assets": file_name,
-                    "Folder": sub_folder,
-                    "Delivered Version": version_number,
-                    "Date Created" : date_created,
-                    "Resolution" : resolution,
-                    "Duration" : duration,
-                    "FPS" : fps_value,
-                    "Frame Count" : frame,
-                }
-            }
-            response = requests.post(AIRTABLE_URL, json=data, headers=headers)
-            if response.status_code != 200:
-                print(f"Failed to add {file_name} to Airtable. Status code: {response.status_code}")
-                print(data) #sanity check on Airtable 402 errors to see why a record bounced
-                failed_files_with_data.append((file_name, data))
-            else:
-                print(f"{file_name} added to Airtable successfully.")
-                successful_files.append(file_name)
-                print("updated csv")
+#def add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames):
+#
+#    for file_name, version_number, root_folder, sub_folder, resolution, date_created, duration, fps_value, frame in zip(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames):
+#        asset_exists_status, record_id = asset_exists(file_name)
+#        
+#
+#        if asset_exists_status:
+#            # Asset already exists, update the version number and metadata
+#            data = {
+#                "fields": {
+#                
+#                    "Delivered Version": version_number,  # Include version number in the data
+#                    "Date Created" : date_created,
+#                    "Resolution" : resolution,
+#                    "Duration" : duration,
+#                    "FPS" : fps_value,
+#                    "Frame Count" : frame,
+#
+#                }
+#            }
+#            response = requests.patch(f"{AIRTABLE_URL}/{record_id}", json=data, headers=headers)
+#            if response.status_code != 200:
+#                print(f"Failed to update version number for {os.path.splitext(file_name)[0]}. Status code: {response.status_code}")
+#                print(data) #sanity check on Airtable 402 errors to see why a record bounced
+#            else:
+#                print(f"Version number for {file_name} updated successfully.")
+#                updated_files.append(file_name)
+#        else:
+#            # Asset does not exist, create a new entry. Note we are using the sub_folder array for the folder entry. 
+#            # parent_folder could also be called here if you wanted two layers of directory organization in your table.
+#            # But we didn't so it doesn't. 
+#            data = {
+#                "fields": {
+#                
+#                    "Assets": file_name,
+#                    "Folder": sub_folder,
+#                    "Delivered Version": version_number,
+#                    "Date Created" : date_created,
+#                    "Resolution" : resolution,
+#                    "Duration" : duration,
+#                    "FPS" : fps_value,
+#                    "Frame Count" : frame,
+#                }
+#            }
+#            response = requests.post(AIRTABLE_URL, json=data, headers=headers)
+#            if response.status_code != 200:
+#                print(f"Failed to add {file_name} to Airtable. Status code: {response.status_code}")
+#                print(data) #sanity check on Airtable 402 errors to see why a record bounced
+#                failed_files_with_data.append((file_name, data))
+#            else:
+#                print(f"{file_name} added to Airtable successfully.")
+#                successful_files.append(file_name)
+#                print("updated csv")
 
  
 # Add file names and update versions to Airtable
 print(file_names) #sanity check on all the records found
-add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames) #do the thing.
+#add_file_names_to_airtable(file_names, version_numbers, root_folders, sub_folders, resolutions, dates, durations, fps_values, frames) #do the thing.
 log_airtable_update_results(successful_files, updated_files, failed_files_with_data)
 print("log updated")
 

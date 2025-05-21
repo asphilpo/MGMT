@@ -7,6 +7,7 @@ import requests
 import dropbox
 import re
 import json
+from datetime import datetime
 from Secrets import *
 
 
@@ -95,9 +96,20 @@ def get_share_link(file_path):
 
 def list_files(folder_path):
     files = []
-    for entry in dbx.files_list_folder(folder_path).entries:
+    result = dbx.files_list_folder(folder_path)
+
+    # First batch
+    for entry in result.entries:
         if isinstance(entry, dropbox.files.FileMetadata):
             files.append(entry.name)
+
+    # If there are more files, continue fetching them
+    while result.has_more:
+        result = dbx.files_list_folder_continue(result.cursor)
+        for entry in result.entries:
+            if isinstance(entry, dropbox.files.FileMetadata):
+                files.append(entry.name)
+
     return files
 
 # Function to match thumbnails with filenames and update Airtable with shared links
@@ -113,37 +125,50 @@ def list_files(folder_path):
 def match_thumbnails_to_airtable(thumbnail_folder_path):
     # Get list of files in the thumbnail folder on Dropbox
     thumbnail_files = list_files(thumbnail_folder_path)
+    print(thumbnail_files)
     
-    # Iterate through each thumbnail file
-    for file_name in thumbnail_files:
-        # Get shared link for the thumbnail file
-        share_link = get_share_link(f"{thumbnail_folder_path}/{file_name}")
+        # Create logs directory if needed
+    os.makedirs("logs", exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_path = os.path.join("logs", f"thumbinator_log_{timestamp}.csv")
+
+    with open(log_path, mode="w", newline="", encoding="utf-8") as logfile:
+        writer = csv.writer(logfile)
+        writer.writerow(["Thumbnail", "Status", "Dropbox Link", "Airtable Record ID", "Error Message"])
         
-        # Find the corresponding record in Airtable with matching filename
-        asset_name = os.path.splitext(file_name)[0]  # Remove file extension to match with asset names
-        asset_exists_status, record_id = asset_exists(asset_name)
+        # Iterate through each thumbnail file
+        for file_name in thumbnail_files:
+            # Get shared link for the thumbnail file
+            share_link = get_share_link(f"{thumbnail_folder_path}/{file_name}")
         
-        # If matching record found in Airtable, update 'Thumbnail' field with shared link
-        if asset_exists_status:
-            # Update Airtable with the thumbnail attachment
-            data = {
-                "fields": {
-                    "Thumbnail": [
-                        {
-                            "url": share_link,
-                            "filename": ""
-                        }
-                    ]
+            # Find the corresponding record in Airtable with matching filename
+            asset_name = os.path.splitext(file_name)[0]  # Remove file extension to match with asset names
+            asset_exists_status, record_id = asset_exists(asset_name)
+        
+            # If matching record found in Airtable, update 'Thumbnail' field with shared link
+            if asset_exists_status:
+                # Update Airtable with the thumbnail attachment
+                data = {
+                    "fields": {
+                        "Thumbnail": [
+                            {
+                                "url": share_link,
+                                "filename": ""
+                            }
+                        ]
+                    }
                 }
-            }
-            response = requests.patch(f"{AIRTABLE_URL}/{record_id}", json=data, headers=headers)
-            if response.status_code == 200:
-                print(f"Thumbnail attachment for {asset_name} updated successfully.")
-                print(share_link)
+                response = requests.patch(f"{AIRTABLE_URL}/{record_id}", json=data, headers=headers)
+                if response.status_code == 200:
+                    print(f"Thumbnail attachment for {asset_name} updated successfully.")
+                    print(share_link)
+                    writer.writerow([file_name, "Matched", share_link, record_id, ""])
+                else:
+                    print(f"Failed to update thumbnail attachment for {asset_name}. Status code: {response.status_code}")
+                    writer.writerow([file_name, "Error", "", "", str(response.status_code)])
             else:
-                print(f"Failed to update thumbnail attachment for {asset_name}. Status code: {response.status_code}")
-        else:
-            print(f"No matching asset found for thumbnail: {asset_name}")         
+                print(f"No matching asset found for thumbnail: {asset_name}")
+                writer.writerow([file_name, "No Match", "", "", "No record found"])
             
 
 # Function to check if asset already exists in Airtable using filename before the _v suffix

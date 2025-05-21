@@ -4,7 +4,7 @@ import sys
 import tkinter.messagebox
 
 def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", '-r', package])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", '--upgrade', '-r', package])
 package = 'requirements.txt'
 install(package)
 
